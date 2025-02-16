@@ -29,6 +29,11 @@ export class Store {
   /** 时间缩放 1s使用刻度标识数量 */
   timerScale = 10;
 
+  size = {
+    width: 9,
+    height: 16
+  }
+
   constructor() {
     this.timerHandler = new Timer();
   }

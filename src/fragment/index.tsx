@@ -72,7 +72,7 @@ function Fragment({ data, p }: {data: Item, p: DraggableProvided}) {
           height: 50,
         }}
       >
-        <div>
+        <div style={{ width: '100%' }}>
           {
             imgData.map((it, i) => (
               <div

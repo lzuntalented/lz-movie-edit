@@ -1,7 +1,6 @@
 import React, {
-  FunctionComponent, ReactComponentElement, useContext, useEffect, useState,
+  FunctionComponent, ReactComponentElement, useContext, useEffect, useRef, useState,
 } from 'react';
-import { fabric } from 'fabric';
 import Context from '../context';
 import Item from '../store/item';
 import { ItemType, PlayerControlProps, PlayStatus } from './interface';
@@ -25,6 +24,7 @@ export default function PlayControl(props: PlayerControlProps) {
   const [currentItem, setCurrentItem] = useState<Item[]>([]);
   const { currentTime, list, updateFlag } = props;
   const { refresh } = useContext(Context);
+  const curRef = useRef(null);
 
   useEffect(() => {
     const obj = list.filter((it) => currentTime >= it.start
@@ -58,11 +58,22 @@ export default function PlayControl(props: PlayerControlProps) {
   if (currentItem.length === 0) return <div />;
   const chidlren = currentItem.map((it) => {
     const Comp = itemRenderMap[it.type];
-    return (<Move key={it.id}>
-      <div className='player-item'>
-      <Comp {...props} {...it} />
-    </div>
-    </Move>);
+    const { width, height } = curRef.current?.parentNode?.getBoundingClientRect() || {};
+    return (
+      <div
+        className="player-item"
+        key={it.id}
+        style={{
+          left: it.x,
+          top: it.y,
+          width: it.scale * width,
+          height: it.scale * height,
+        }}
+        ref={curRef}
+      >
+        <Comp {...props} {...it} />
+      </div>
+    );
   });
 
   if (currentItem[0].transition

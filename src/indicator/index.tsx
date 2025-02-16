@@ -15,12 +15,12 @@ function Indicator() {
       const ctx = canvasRef.current.getContext('2d', 60) as CanvasRenderingContext2D;
 
       const ratio = (window.devicePixelRatio || 1);
-      const width = lines.length * SCALE_DOM_SPACE
+      const width = lines.length * SCALE_DOM_SPACE;
 
       if (ratio > 1) {
         // const height = defaultHeiht || this.height;
         canvasRef.current.style.height = `${60}px`;
-        canvasRef.current.style.width = `${width }px`;
+        canvasRef.current.style.width = `${width}px`;
         canvasRef.current.width = width * ratio;
         canvasRef.current.height = 60 * ratio;
       }
@@ -37,7 +37,7 @@ function Indicator() {
         ctx.stroke();
         ctx.lineWidth /= ratio;
         if (i % 10 === 0 && i !== 0) {
-          const timeStr = `${Math.floor((i / store.timerScale * 10) ) / 10}s`;
+          const timeStr = `${Math.floor((i / store.timerScale * 10)) / 10}s`;
           ctx.fillStyle = '#262e48';
           ctx.font = ctx.font.replace(
             /(\d+)(px|em|rem|pt)/g,
@@ -59,7 +59,7 @@ function Indicator() {
     curX: 0,
   });
   const onMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    e.stopPropagation()
+    e.stopPropagation();
     const x = e.clientX;
     lastX.current = { x, moving: true, curX: x };
 
@@ -75,7 +75,7 @@ function Indicator() {
       const x = e.clientX || lastX.current.curX;
       const time = (x - lastX.current.x) / SCALE_DOM_SPACE * (1000 / store.timerScale);
       lastX.current.x = x;
-      store.setCurrentTime(store.currentTime + time );
+      store.setCurrentTime(store.currentTime + time);
       store.pause();
       refresh();
     }
@@ -85,13 +85,14 @@ function Indicator() {
     if (lastX.current.moving) {
       const x = e.clientX || lastX.current.curX;
       const time = (x - lastX.current.x) / SCALE_DOM_SPACE * (1000 / store.timerScale);
-      store.setCurrentTime(store.currentTime + time );
+      store.setCurrentTime(store.currentTime + time);
       store.pause();
       refresh();
     }
     lastX.current = { x: 0, moving: false, curX: 0 };
   };
 
+  const indicatorLeft = (store.currentTime / 1000) * store.timerScale * SCALE_DOM_SPACE;
   return (
     <div
       className="indicator"
@@ -101,7 +102,7 @@ function Indicator() {
       onMouseLeave={onMouseLeave}
       onMouseUp={onMouseLeave}
     >
-      <div className="indicator-point" style={{ left: store.currentTime / 1000 * store.timerScale * SCALE_DOM_SPACE }} />
+      <div className="indicator-point" style={{ left: indicatorLeft }} />
       <canvas
         ref={canvasRef}
         width={lines.length * 10 + 10 * 10}

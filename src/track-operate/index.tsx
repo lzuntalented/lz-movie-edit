@@ -47,9 +47,9 @@ function TrackOperate() {
   };
   return (
     <div className="track-operate">
-      <Row style={{ width: '100%' }}>
+      <Row style={{ width: '100%' }} align="middle">
         <Col span={8}>
-          <Row gutter={24}>
+          <Row gutter={24} align="middle">
             <Col>
               添加片段
             </Col>

@@ -45,6 +45,9 @@ function getConfig(type: number) {
       break;
   }
   result.push({ key: 'duration', type: 1, label: '时长' });
+  result.push({ key: 'x', type: 1, label: 'x' });
+  result.push({ key: 'y', type: 1, label: 'y' });
+  result.push({ key: 'scale', type: 1, label: 'scale' });
   return result;
 }
 

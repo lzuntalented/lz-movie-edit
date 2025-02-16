@@ -8,6 +8,12 @@ export default class Item {
 
   duration: number = 0;
 
+  x: number = 0;
+
+  y: number = 0;
+
+  scale: number = 1;
+
   title: string = '';
 
   url: string = '';
