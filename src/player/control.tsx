@@ -11,6 +11,7 @@ import Music from './music';
 import store from '../store';
 import Animation from './animation';
 import Move from './move';
+import { isUndefined } from '../utils';
 
 const itemRenderMap = {
   [ItemType.VIDEO]: Video,
@@ -19,12 +20,15 @@ const itemRenderMap = {
   [ItemType.MUSIC]: Music,
 } as any;
 
-export default function PlayControl(props: PlayerControlProps) {
-  const { playStatus } = props;
+export default function PlayControl(props: PlayerControlProps & {
+  playSize: { width: number| string, height: number| string }
+}) {
+  const { playStatus, playSize } = props;
   const [currentItem, setCurrentItem] = useState<Item[]>([]);
   const { currentTime, list, updateFlag } = props;
   const { refresh } = useContext(Context);
   const curRef = useRef(null);
+  console.log(playSize, 'paysieze');
 
   useEffect(() => {
     const obj = list.filter((it) => currentTime >= it.start
@@ -58,7 +62,7 @@ export default function PlayControl(props: PlayerControlProps) {
   if (currentItem.length === 0) return <div />;
   const chidlren = currentItem.map((it) => {
     const Comp = itemRenderMap[it.type];
-    const { width, height } = curRef.current?.parentNode?.getBoundingClientRect() || {};
+    // const { width, height } = curRef.current?.parentNode?.getBoundingClientRect() || {};
     return (
       <div
         className="player-item"
@@ -66,10 +70,10 @@ export default function PlayControl(props: PlayerControlProps) {
         style={{
           left: it.x,
           top: it.y,
-          width: it.scale * width,
-          height: it.scale * height,
+          width: isUndefined(playSize.width) ? 'auto' : it.scale * playSize.width,
+          height: isUndefined(playSize.height) ? 'auto' : it.scale * playSize.height,
         }}
-        ref={curRef}
+        // ref={curRef}
       >
         <Comp {...props} {...it} />
       </div>

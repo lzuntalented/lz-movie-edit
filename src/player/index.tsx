@@ -10,6 +10,7 @@ import store from '../store';
 import Indicator from '../indicator';
 import './index.scss';
 import { Dropdown, Menu } from 'antd';
+import { getPanelSizeOptions, PLAY_PANEL_SIZE } from './config';
 
 // interface EventProps {
 
@@ -44,35 +45,79 @@ export default function Player(props: PlayerProps) {
   const palyDom = useRef<HTMLDivElement>(null);
   const [showWidth, setShowWidth] = useState(0);
   const [showHeight, setShowHeight] = useState(0);
-  const [activeMenu, setActiveMenu] = useState('1');
+  const [activeMenu, setActiveMenu] = useState(PLAY_PANEL_SIZE.H);
+  const panelOptions = getPanelSizeOptions();
+  const [playSize, setPlaySize] = useState({
+    width: 0,
+    height: 0,
+  });
+  const [showSize, setShowSize] = useState({
+    width: 0,
+    height: 0,
+  });
+
+  const getPlaySize = () => {
+    if (palyDom.current) {
+      const { height, width } = palyDom.current.getBoundingClientRect();
+      // console.log(height);
+      const playSizeWidth = width - (64 * 2);
+      const playSizeHeight = height - (64 * 2);
+      setPlaySize({
+        width: playSizeWidth,
+        height: playSizeHeight,
+      });
+      return {
+        width: playSizeWidth,
+        height: playSizeHeight,
+      };
+    }
+  };
+
   useEffect(() => {
     store.setUpdateCallback(() => {
       refresh();
     });
     if (palyDom.current) {
-      palyDom.current.style.height = '100%';
-      palyDom.current.style.width = 'initial';
-      const { height } = palyDom.current.getBoundingClientRect();
-      // console.log(height);
-      const { size } = store;
-      setShowWidth(size.width / size.height * height);
+      // palyDom.current.style.height = '100%';
+      // palyDom.current.style.width = 'initial';
+      const playSizeObj = getPlaySize();
+      if (playSizeObj) {
+        const { height, width } = playSizeObj;
+        // 判断宽高比是否与9:16的关系，以短边为基准，重新计算宽高
+        if (width / height > 9 / 16) {
+          setShowSize({
+            height,
+            width: height * (9 / 16),
+          });
+        } else {
+          setShowSize({
+            width,
+            height: width * (9 / 16),
+          });
+        }
+      }
     }
   }, []);
 
-  const onChangeDp = (e: {key: string}) => {
-    if (palyDom.current) {
-      if (e.key === '2') {
-        palyDom.current.style.width = '100%';
-        palyDom.current.style.height = 'initial';
-        const { width } = palyDom.current.getBoundingClientRect();
-        const { size } = store;
-        setShowHeight(size.width / size.height * width);
+  const onChangeDp = (e: {key: PLAY_PANEL_SIZE.H}) => {
+    const playSizeObj = getPlaySize();
+    if (playSizeObj) {
+      const { height, width } = playSizeObj;
+      if (e.key === PLAY_PANEL_SIZE.H) {
+        setShowSize({
+          height,
+          width: height * (9 / 16),
+        });
       } else {
-        palyDom.current.style.height = '100%';
-        palyDom.current.style.width = 'initial';
-        const { height } = palyDom.current.getBoundingClientRect();
-        const { size } = store;
-        setShowWidth(size.width / size.height * height);
+        setShowSize({
+          width,
+          height: width * (9 / 16),
+        });
+      }
+      const obj = panelOptions.find((o) => o.value === e.key);
+      if (obj) {
+        store.size.width = obj?.width;
+        store.size.height = obj?.height;
       }
     }
     setActiveMenu(e.key);
@@ -81,8 +126,14 @@ export default function Player(props: PlayerProps) {
   // console.log('refresh active-----------');
 
   return (
-    <div className="area-center">
-      <div className="area-player" ref={palyDom} style={activeMenu === '1' ? { width: showWidth } : { height: showHeight }}>
+    <div className="area-center" ref={palyDom}>
+      <div
+        className="area-player"
+        style={{
+          width: showSize.width,
+          height: showSize.height,
+        }}
+      >
         {/* <div>{store.currentTime}</div> */}
         {
         layers.map((item) => (
@@ -93,6 +144,10 @@ export default function Player(props: PlayerProps) {
               playStatus={store.playStatus}
               list={item.items}
               currentTime={store.currentTime}
+              playSize={{
+                width: showSize.width,
+                height: showSize.height,
+              }}
             />
           </div>
         ))
@@ -100,13 +155,10 @@ export default function Player(props: PlayerProps) {
       </div>
       <Dropdown
         menu={{
-          items: [{
-            key: '1',
-            label: '9:16',
-          }, {
-            key: '2',
-            label: '16:9',
-          }],
+          items: panelOptions.map((item) => ({
+            key: item.value,
+            label: item.label,
+          })),
           onClick: onChangeDp,
         }}
       >

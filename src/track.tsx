@@ -15,7 +15,7 @@ function Track() {
     if (!result.destination) {
       return;
     }
-   
+
     store.exchangeItem(
       { index: result.source.index, layer: store.getLayer(result.source.droppableId) },
       { index: result.destination.index, layer: store.getLayer(result.destination.droppableId) },

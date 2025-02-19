@@ -128,3 +128,5 @@ export function setupCanvas(canvas: HTMLCanvasElement) {
   ctx.scale(dpr, dpr);
   return ctx;
 }
+
+export const isUndefined = (v: any) => typeof v === 'undefined';

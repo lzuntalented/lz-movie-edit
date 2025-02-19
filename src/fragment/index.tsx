@@ -61,12 +61,12 @@ function Fragment({ data, p }: {data: Item, p: DraggableProvided}) {
         store.setActvieItemId(id);
         refresh();
       }}
+      ref={p.innerRef}
+      {...(p.draggableProps)}
+      {...(p.dragHandleProps)}
     >
       <div
         className={`fragment-drag  ${id === store.activeItemId ? 'active' : ''}`}
-        ref={p.innerRef}
-        {...(p.draggableProps)}
-        {...(p.dragHandleProps)}
         style={{
           width: len,
           height: 50,
