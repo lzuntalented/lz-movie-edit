@@ -1,6 +1,7 @@
 import { Resizable } from 're-resizable';
 import React, { useContext, useEffect, useState } from 'react';
 import { DraggableProvided } from 'react-beautiful-dnd';
+import { StarFilled, StarTwoTone } from '@ant-design/icons';
 import Context from '../context';
 import { ItemType } from '../player/interface';
 import store from '../store';
@@ -72,7 +73,7 @@ function Fragment({ data, p }: {data: Item, p: DraggableProvided}) {
           height: 50,
         }}
       >
-        <div style={{ width: '100%' }}>
+        <div style={{ width: '100%', position: 'relative' }}>
           {
             imgData.map((it, i) => (
               <div
@@ -82,6 +83,19 @@ function Fragment({ data, p }: {data: Item, p: DraggableProvided}) {
                   backgroundImage: `url(${it})`,
                   width: `${Math.floor(100 / imgData.length)}%`,
                 }}
+              />
+            ))
+          }
+          {
+            data?.keyFrames?.map((it) => (
+              <StarTwoTone
+                twoToneColor={it.id === store.activeKeyframeId && store.activeKeyframeId ? 'red' : undefined}
+                key={it.pos}
+                style={{
+                  left: it.pos / 1000 * store.timerScale * SCALE_DOM_SPACE,
+                }}
+                className="fragment-key-frame "
+                onClick={() => { store.activeKeyframeId = it.id; }}
               />
             ))
           }

@@ -29,10 +29,13 @@ export class Store {
   /** 时间缩放 1s使用刻度标识数量 */
   timerScale = 10;
 
+  /** 当前激活的关键帧 */
+  activeKeyframeId = '';
+
   size = {
     width: 9,
-    height: 16
-  }
+    height: 16,
+  };
 
   constructor() {
     this.timerHandler = new Timer();
@@ -272,6 +275,13 @@ export class Store {
   setActvieItemId(id: string) {
     this.activeItemId = id;
     this.activeLayer = this.layers.findIndex((l) => !!l.items.find((item) => item.id === id));
+  }
+
+  /** 获取当前激活态的关键帧 */
+  getActiveKeyframe() {
+    const { activeKeyframeId } = this;
+    const item = this.getActiveItem();
+    return item?.getKeyFrames()?.find((it) => it.id === activeKeyframeId);
   }
 }
 

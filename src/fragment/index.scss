@@ -19,4 +19,15 @@
     background-position: center center;
     background-repeat: no-repeat;
   }
+
+  &-key-frame {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+
+    &.actvie {
+      color: red;
+    }
+  }
 }

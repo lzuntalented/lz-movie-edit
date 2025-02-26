@@ -44,6 +44,14 @@ export default function App() {
       store.initValue(JSON.parse(defaultDemoValue) as Layer[]);
     }
     refresh();
+    // const onExitSystem = (e: any) => {
+    //   e.preventDefault();
+    //   alert('还未保存，确定退出？');
+    // };
+    // window.addEventListener('beforeunload', onExitSystem);
+    // return () => {
+    //   window.removeEventListener('beforeunload', onExitSystem);
+    // };
   }, []);
 
   const activeTtem = store.getActiveItem();

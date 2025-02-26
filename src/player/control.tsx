@@ -28,7 +28,6 @@ export default function PlayControl(props: PlayerControlProps & {
   const { currentTime, list, updateFlag } = props;
   const { refresh } = useContext(Context);
   const curRef = useRef(null);
-  console.log(playSize, 'paysieze');
 
   useEffect(() => {
     const obj = list.filter((it) => currentTime >= it.start
@@ -63,6 +62,18 @@ export default function PlayControl(props: PlayerControlProps & {
   const chidlren = currentItem.map((it) => {
     const Comp = itemRenderMap[it.type];
     // const { width, height } = curRef.current?.parentNode?.getBoundingClientRect() || {};
+    const timespace = store.currentTime - it.start;
+
+    const keyframes = it.getKeyFrames();
+    if (keyframes && keyframes.length > 1) {
+      for (let len = keyframes?.length || 0, i = len - 1; i > 1; i--) {
+        const keyframe = keyframes[i];
+        if (keyframe.pos > timespace) {
+          // 计算当前帧与上一帧缩放间隔，同时根据时间间隔来计算当前尺寸
+
+        }
+      }
+    }
     return (
       <div
         className="player-item"

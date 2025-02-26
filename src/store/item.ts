@@ -29,6 +29,15 @@ export default class Item {
 
   transition?: Transition;
 
+  /** 关键帧列表 */
+  keyFrames?: {
+    x: number;
+    y: number;
+    scale: number;
+    pos: number;
+    id: string;
+  }[];
+
   constructor(duration: number, title: string) {
     this.start = 0;
     this.id = createId();
@@ -53,4 +62,11 @@ export default class Item {
     });
     return item;
   }
+
+  addKeyframe(kf: { x: number; y: number; scale: number; pos: number }) {
+    if (!this.keyFrames) { this.keyFrames = []; }
+    this.keyFrames.push({ ...kf, id: createId() });
+  }
+
+  getKeyFrames() { return this.keyFrames; }
 }

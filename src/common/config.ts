@@ -15,3 +15,12 @@ export const POINT_RIGHT_TOP = 'rt';
 export const POINT_LEFT_BOTTOM = 'lb';
 export const POINT_RIGHT_BOTTOM = 'rb';
 export const POINT_ROTATE = 'rotate';
+
+/** 组件类型 */
+export enum WIDGET_TYPE {
+  IMAGE = 1,
+  VIDEO,
+  TEXT,
+  MUSIC,
+  TRACK,
+}

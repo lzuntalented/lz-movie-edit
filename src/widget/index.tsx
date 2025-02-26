@@ -6,6 +6,7 @@ import store from '../store';
 import Item from '../store/item';
 import './index.scss';
 import { isDev } from '../common/env';
+import { WIDGET_TYPE } from '../common/config';
 
 const picList = isDev ? [
   'http://localhost:9000/1.jpg',
@@ -98,9 +99,9 @@ function Widget({ activeWidgetId }: Props) {
   return (
     <div className="widget">
       <Row gutter={24}>
-        {activeWidgetId === 1
+        {activeWidgetId === WIDGET_TYPE.IMAGE
           && picList.map((it) => (
-            <Col key={it} span={12}>
+            <Col key={it} span={12} className="widget-item">
               <img
                 src={it}
                 alt=""
@@ -111,9 +112,9 @@ function Widget({ activeWidgetId }: Props) {
               />
             </Col>
           ))}
-        {activeWidgetId === 2
+        {activeWidgetId === WIDGET_TYPE.VIDEO
           && videoList.map((it) => (
-            <Col key={it} span={12}>
+            <Col key={it} span={12} className="widget-item">
               <video
                 src={it}
                 width="100%"
@@ -123,9 +124,9 @@ function Widget({ activeWidgetId }: Props) {
               />
             </Col>
           ))}
-        {activeWidgetId === 3
+        {activeWidgetId === WIDGET_TYPE.TEXT
           && textList.map((it) => (
-            <Col key={it} span={12}>
+            <Col key={it} span={12} className="widget-item">
               <img
                 src={it}
                 alt=""
@@ -136,9 +137,9 @@ function Widget({ activeWidgetId }: Props) {
               />
             </Col>
           ))}
-        {activeWidgetId === 4
+        {activeWidgetId === WIDGET_TYPE.MUSIC
             && audioList.map((it, i) => (
-              <Col key={it} span={24}>
+              <Col key={it} span={24} className="widget-item">
                 <div
                   onClick={() => {
                     onAddMusic(it);
@@ -165,6 +166,25 @@ function Widget({ activeWidgetId }: Props) {
                 </div>
               </Col>
             ))}
+        {activeWidgetId === WIDGET_TYPE.TRACK
+            && (
+              <Col span={24} className="widget-item">
+                <div
+                  onClick={() => {
+                    onAddLayer();
+                  }}
+                  style={{
+                    width: '100%',
+                    height: '40px',
+                    marginBottom: 12,
+                    backgroundColor: '#fff',
+                    lineHeight: '40px',
+                  }}
+                >
+                  添加轨道
+                </div>
+              </Col>
+            )}
       </Row>
     </div>
   );

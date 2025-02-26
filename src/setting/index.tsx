@@ -71,9 +71,13 @@ function Setting(props: Props) {
 
   const onValuesChange = (v) => {
     // console.log('onValuesChange', v);
+    const keyframe = store.getActiveKeyframe();
     Object.keys(v).forEach((k) => {
       if (list.find((it) => it.type === 1)) {
         data[k] = Number(v[k]);
+        if (keyframe) {
+          keyframe[k] = Number(v[k]);
+        }
       } else {
         data[k] = v[k];
       }

@@ -41,6 +41,21 @@ function TrackOperate() {
     store.initValue(JSON.parse(defaultDemoValue) as Layer[]);
     refresh();
   };
+  const onAddKeyFrame = () => {
+    const activeItem = store.getActiveItem();
+    if (activeItem) {
+      activeItem.addKeyframe({
+        x: activeItem.x,
+        y: activeItem.y,
+        scale: activeItem.scale,
+        pos: store.currentTime - activeItem.start,
+      });
+      refresh();
+    }
+  };
+  const onRemoveKeyFrame = () => {
+
+  };
 
   const onSave = () => {
     console.log('current-value---------------------', store.save());
@@ -59,30 +74,28 @@ function TrackOperate() {
               </Button>
             </Col>
             <Col>
-            <Slider min={0} max={20}
-            value={store.timerScale}
-            style={{width: 100}} 
-            step={2}
-            onChange={v => {
-              store.timerScale = v;
-              refresh()
-            }}
-            />
+              <Slider
+                min={0}
+                max={20}
+                value={store.timerScale}
+                style={{ width: 100 }}
+                step={2}
+                onChange={(v) => {
+                  store.timerScale = v;
+                  refresh();
+                }}
+              />
             </Col>
           </Row>
         </Col>
         <Col span={8}>
-          {/* {Math.floor(store.currentTime)}
-          {' '}
-          /
-          {moment(Math.floor(store.currentTime)).format('mm:ss')} */}
           {
-                      formatTime(store.currentTime)
-                    }
+            formatTime(store.currentTime)
+          }
           /
           {
-                      formatTime(store.getTotalTime())
-                    }
+            formatTime(store.getTotalTime())
+          }
           <Button size="small" onClick={onChange} type="primary">
             {store.playStatus === PlayStatus.PLAYING ? '暂停' : '播放'}
           </Button>
@@ -104,6 +117,20 @@ function TrackOperate() {
                 保存
               </Button>
             </Col>
+            {store.getActiveItem() && (
+            <Col>
+              <Button size="small" onClick={onAddKeyFrame}>
+                关键帧+
+              </Button>
+            </Col>
+            )}
+            {store.getActiveItem() && (
+            <Col>
+              <Button size="small" onClick={onRemoveKeyFrame}>
+                关键帧-
+              </Button>
+            </Col>
+            )}
           </Row>
         </Col>
       </Row>
