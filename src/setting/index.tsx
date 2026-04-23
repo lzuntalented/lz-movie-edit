@@ -173,6 +173,17 @@ function Setting(props: Props) {
             ))
             }
           </Form>
+          <Button
+            danger
+            onClick={() => {
+              store.removeItem();
+              store.updateFlag = Symbol(1);
+              refresh();
+            }}
+            style={{ marginLeft: 8 }}
+          >
+            删除片段
+          </Button>
         </div>
       </div>
     </Resizable>

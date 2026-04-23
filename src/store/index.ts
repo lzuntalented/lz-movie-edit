@@ -231,20 +231,27 @@ export class Store {
     this.layers = [];
     this.stop();
     this.currentTime = 0;
+    this.timerHandler.resetCurrentTime(0);
+    this.updateFlag = Symbol(1);
     this.addLayer();
   }
 
   /** 移除当前选中元素 */
   removeItem() {
     const layer = this.getActiveLayer();
-    console.log(layer.id);
     const itemIdx = layer.items.findIndex((it) => it.id === this.activeItemId);
     if (itemIdx > -1) {
+      const removedItem = layer.items[itemIdx];
+      const removedDuration = removedItem.duration;
       layer.items.splice(itemIdx, 1);
+      for (let i = itemIdx; i < layer.items.length; i++) {
+        layer.items[i].start -= removedDuration;
+      }
       if (layer.items.length === 0) {
         this.layers.splice(this.layers.indexOf(layer), 1);
         this.activeLayer = this.layers.length - 1;
       }
+      this.updateFlag = Symbol(1);
     }
   }
 
@@ -254,6 +261,9 @@ export class Store {
 
   initValue(val: Layer[]) {
     this.clear();
+    this.currentTime = 0;
+    this.timerHandler.resetCurrentTime(0);
+    this.updateFlag = Symbol(1);
     this.layers = [];
     val.forEach((item) => {
       const newLayer = this.addLayer();
