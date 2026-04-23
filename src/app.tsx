@@ -78,11 +78,9 @@ export default function App() {
             <Col span={12}>
               <Player layers={store.layers} refresh={state.refreshFlag} />
             </Col>
-            <Col span={6}>
-              {
-                  activeTtem && <Setting key={activeTtem?.id} data={activeTtem} />
-                }
-            </Col>
+            {
+                activeTtem && <Setting key={activeTtem?.id} data={activeTtem} />
+            }
           </Row>
         </Col>
       </Row>

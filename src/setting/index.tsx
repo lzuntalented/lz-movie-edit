@@ -1,14 +1,12 @@
 import { Button, Form, Input } from 'antd';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import { Resizable } from 're-resizable';
 import Context from '../context';
 import { ItemType } from '../player/interface';
 import store from '../store';
 import Item from '../store/item';
-import { isNumber } from '../utils';
 
 interface Props {
-  // id: string;
-  // list: {key: string; label: string}[]
   data: Item
 }
 
@@ -27,13 +25,11 @@ function getConfig(type: number) {
     }
     case ItemType.VIDEO: {
       result.push({ key: 'url', label: '视频地址' });
-      // result.push({ key: 'playStart', type: 1, label: '开始时间' });
       result.push({ key: 'volume', type: 1, label: '音量' });
       break;
     }
     case ItemType.MUSIC: {
       result.push({ key: 'url', label: '音频地址' });
-      // result.push({ key: 'playStart', type: 1, label: '开始时间' });
       result.push({ key: 'volume', type: 1, label: '音量' });
       break;
     }
@@ -56,6 +52,9 @@ function Setting(props: Props) {
   const list = getConfig(data.type);
   const [formRef] = Form.useForm();
   const { refresh } = useContext(Context);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
+  const [size, setSize] = useState({ width: 300, height: window.innerHeight - 24 - 300 });
 
   useEffect(() => {
     if (data) {
@@ -64,13 +63,38 @@ function Setting(props: Props) {
       list.forEach((it) => {
         vals[it.key] = data[it.key];
       });
-      // console.log(list, vals, data);
       formRef.setFieldsValue(vals);
     }
   }, [data]);
 
-  const onValuesChange = (v) => {
-    // console.log('onValuesChange', v);
+  const onMouseDown = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDragging(true);
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (dragging) {
+        setPosition((prev) => ({
+          x: prev.x - e.movementX,
+          y: prev.y + e.movementY,
+        }));
+      }
+    };
+    const handleMouseUp = () => {
+      setDragging(false);
+    };
+    if (dragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [dragging]);
+
+  const onValuesChange = (v: any) => {
     const keyframe = store.getActiveKeyframe();
     Object.keys(v).forEach((k) => {
       if (list.find((it) => it.type === 1)) {
@@ -84,25 +108,74 @@ function Setting(props: Props) {
     });
     refresh();
   };
+
   return (
-    <div>
-      <Button onClick={() => {
-        store.addTransaction(data.id);
-        refresh();
+    <Resizable
+      size={size}
+      onResize={(e, direction, ref) => {
+        setSize({ width: ref.offsetWidth, height: ref.offsetHeight });
       }}
+      style={{
+        position: 'fixed',
+        left: window.innerWidth - 24 - size.width - position.x,
+        top: 24 + position.y,
+        zIndex: 1000,
+      }}
+    >
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          backgroundColor: '#fff',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+          borderRadius: 4,
+          overflow: 'auto',
+        }}
+        onClick={(e) => e.stopPropagation()}
       >
-        添加转场
-      </Button>
-      <Form form={formRef} onValuesChange={onValuesChange}>
-        {
-        list.map((it) => (
-          <Form.Item key={it.key} label={it.label} name={it.key}>
-            <Input />
-          </Form.Item>
-        ))
-      }
-      </Form>
-    </div>
+        <div
+          style={{
+            padding: '8px',
+            cursor: 'move',
+            borderBottom: '1px solid #f0f0f0',
+            backgroundColor: '#fafafa',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+          onMouseDown={onMouseDown}
+        >
+          <span style={{ fontWeight: 'bold' }}>属性面板</span>
+          <Button
+            size="small"
+            onClick={() => {
+              store.activeItemId = 0;
+              refresh();
+            }}
+          >
+            ×
+          </Button>
+        </div>
+        <div style={{ padding: 16 }}>
+          <Button onClick={() => {
+            store.addTransaction(data.id);
+            refresh();
+          }}
+          >
+            添加转场
+          </Button>
+          <Form form={formRef} onValuesChange={onValuesChange}>
+            {
+            list.map((it) => (
+              <Form.Item key={it.key} label={it.label} name={it.key}>
+                <Input />
+              </Form.Item>
+            ))
+            }
+          </Form>
+        </div>
+      </div>
+    </Resizable>
   );
 }
 
