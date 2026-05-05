@@ -20,6 +20,14 @@ export default class Item {
 
   content: string = '';
 
+  bg: string = '';
+
+  color: string = '';
+
+  fontSize: number = 16;
+
+  textAlign: string = 'center';
+
   playStart: number = 0;
 
   // playDuration: number = 0;

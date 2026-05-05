@@ -27,7 +27,10 @@ const videoList = isDev ? [
 ];
 
 const textList = [
-  'https://js.xiudodo.com/colorful/previews/2.png?x-oss-process=image/crop,x_50,w_300,y_50,h_300/resize,w_180/interlace,1/sharpen,100/quality,q_98',
+  { id: 1, content: '我是字幕', bg: 'transparent', color: '#000' },
+  { id: 2, content: '标题文字', bg: '#1890ff', color: '#fff' },
+  { id: 3, content: '精彩瞬间', bg: '#ff4d4f', color: '#fff' },
+  { id: 4, content: '2024', bg: '#52c41a', color: '#fff' },
 ];
 
 const audioList = isDev ? [
@@ -64,11 +67,12 @@ function Widget({ activeWidgetId }: Props) {
     store.updateFlag = Symbol(1);
     refresh();
   };
-  const onAddText = () => {
-    const content = '我是字幕';
+  const onAddText = (text: { content: string; bg: string; color: string }) => {
     const layer = store.getActiveLayer();
     const item = new Item(1000 * 1, '文字');
-    item.content = content;
+    item.content = text.content;
+    item.bg = text.bg;
+    item.color = text.color;
     item.type = ItemType.TEXT;
     layer.addItem(item);
     store.activeItemId = item.id;
@@ -126,15 +130,20 @@ function Widget({ activeWidgetId }: Props) {
           ))}
         {activeWidgetId === WIDGET_TYPE.TEXT
           && textList.map((it) => (
-            <Col key={it} span={12} className="widget-item">
-              <img
-                src={it}
-                alt=""
-                width="100%"
-                onClick={() => {
-                  onAddText();
+            <Col key={it.id} span={12} className="widget-item">
+              <div
+                style={{
+                  backgroundColor: it.bg,
+                  color: it.color,
+                  padding: '20px',
+                  textAlign: 'center',
+                  borderRadius: 4,
+                  cursor: 'pointer',
                 }}
-              />
+                onClick={() => onAddText(it)}
+              >
+                {it.content}
+              </div>
             </Col>
           ))}
         {activeWidgetId === WIDGET_TYPE.MUSIC

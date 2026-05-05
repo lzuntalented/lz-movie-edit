@@ -69,7 +69,7 @@ export default function App() {
           />
         </Col>
         <Col style={{ flex: 1 }}>
-          <Row itemType="flex" justify="space-between">
+          <Row itemType="flex">
             {state.activeWidgetId > 0 && (
             <Col>
               <Widget activeWidgetId={state.activeWidgetId} />

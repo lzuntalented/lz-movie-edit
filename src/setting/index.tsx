@@ -1,4 +1,4 @@
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input, Select } from 'antd';
 import React, { useContext, useEffect, useState } from 'react';
 import { Resizable } from 're-resizable';
 import Context from '../context';
@@ -35,6 +35,10 @@ function getConfig(type: number) {
     }
     case ItemType.TEXT: {
       result.push({ key: 'content', label: '内容' });
+      result.push({ key: 'fontSize', type: 1, label: '字号' });
+      result.push({ key: 'textAlign', label: '对齐方式' });
+      result.push({ key: 'bg', label: '背景色' });
+      result.push({ key: 'color', label: '文字颜色' });
       break;
     }
     default:
@@ -97,7 +101,8 @@ function Setting(props: Props) {
   const onValuesChange = (v: any) => {
     const keyframe = store.getActiveKeyframe();
     Object.keys(v).forEach((k) => {
-      if (list.find((it) => it.type === 1)) {
+      const configItem = list.find((it) => it.key === k);
+      if (configItem?.type === 1) {
         data[k] = Number(v[k]);
         if (keyframe) {
           keyframe[k] = Number(v[k]);
@@ -168,7 +173,13 @@ function Setting(props: Props) {
             {
             list.map((it) => (
               <Form.Item key={it.key} label={it.label} name={it.key}>
-                <Input />
+                {it.key === 'textAlign' ? (
+                  <Select>
+                    <Select.Option value="left">左对齐</Select.Option>
+                    <Select.Option value="center">居中</Select.Option>
+                    <Select.Option value="right">右对齐</Select.Option>
+                  </Select>
+                ) : <Input />}
               </Form.Item>
             ))
             }
