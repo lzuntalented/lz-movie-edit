@@ -25,11 +25,13 @@ function getConfig(type: number) {
     }
     case ItemType.VIDEO: {
       result.push({ key: 'url', label: '视频地址' });
+      result.push({ key: 'playStart', type: 1, label: '开始时间' });
       result.push({ key: 'volume', type: 1, label: '音量' });
       break;
     }
     case ItemType.MUSIC: {
       result.push({ key: 'url', label: '音频地址' });
+      result.push({ key: 'playStart', type: 1, label: '开始时间' });
       result.push({ key: 'volume', type: 1, label: '音量' });
       break;
     }
@@ -44,10 +46,14 @@ function getConfig(type: number) {
     default:
       break;
   }
-  result.push({ key: 'duration', type: 1, label: '时长' });
-  result.push({ key: 'x', type: 1, label: 'x' });
-  result.push({ key: 'y', type: 1, label: 'y' });
-  result.push({ key: 'scale', type: 1, label: 'scale' });
+  if (type !== ItemType.MUSIC) {
+    result.push({ key: 'duration', type: 1, label: '时长' });
+    result.push({ key: 'x', type: 1, label: 'x' });
+    result.push({ key: 'y', type: 1, label: 'y' });
+    result.push({ key: 'scale', type: 1, label: 'scale' });
+  } else {
+    result.push({ key: 'duration', type: 1, label: '时长' });
+  }
   return result;
 }
 
