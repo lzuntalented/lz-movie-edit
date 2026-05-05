@@ -1,5 +1,7 @@
 import { Resizable } from 're-resizable';
-import React, { useContext, useEffect, useState } from 'react';
+import React, {
+  useContext, useEffect, useRef, useState,
+} from 'react';
 import { DraggableProvided } from 'react-beautiful-dnd';
 import { StarFilled, StarTwoTone } from '@ant-design/icons';
 import Context from '../context';
@@ -13,12 +15,14 @@ import { SCALE_DOM_SPACE } from '../common/config';
 
 function Fragment({ data, p }: {data: Item, p: DraggableProvided}) {
   const { start, duration, id } = data;
-  // const timerScale = store.timerScale * 1000;
   const len = duration / 1000 * store.timerScale * SCALE_DOM_SPACE;
   const { refresh } = useContext(Context);
   const imgLen = Math.ceil(duration / 1000);
-  // const imgData = new Array(imgLen).fill(data.url);
   const [imgData, setImgData] = useState<string[]>([]);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const animationRef = useRef<number>(0);
 
   const getImageData = async () => {
     const videoData = new Array(imgLen).fill(data.url);
@@ -36,24 +40,94 @@ function Fragment({ data, p }: {data: Item, p: DraggableProvided}) {
     setImgData(list);
   };
 
+  const drawWaveform = async () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    const canvasWidth = len;
+    const canvasHeight = 50;
+    const { playStart = 0 } = data;
+    const playDuration = data.duration;
+
+    canvas.width = canvasWidth * dpr;
+    canvas.height = canvasHeight * dpr;
+    ctx.scale(dpr, dpr);
+
+    try {
+      const audioCtx = new AudioContext();
+      const response = await fetch(data.url);
+      const arrayBuffer = await response.arrayBuffer();
+      const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+      const channelData = audioBuffer.getChannelData(0);
+      const totalSamples = channelData.length;
+      const audioDuration = audioBuffer.duration;
+      const barWidth = 2;
+      const bars = Math.floor(canvasWidth / barWidth);
+      const amp = canvasHeight / 2;
+
+      const startRatio = playStart / 1000 / audioDuration;
+      const endRatio = (playStart + playDuration) / 1000 / audioDuration;
+      const startSample = Math.floor(startRatio * totalSamples);
+      const endSample = Math.floor(endRatio * totalSamples);
+      const playSamples = endSample - startSample;
+      const step = Math.floor(playSamples / bars) || 1;
+
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+      ctx.fillStyle = '#4CAF50';
+
+      for (let i = 0; i < bars; i++) {
+        let min = 1.0;
+        let max = -1.0;
+        for (let j = 0; j < step; j += 1) {
+          const idx = startSample + (i * step) + j;
+          if (idx < channelData.length && idx < endSample) {
+            const datum = channelData[idx];
+            if (datum < min) min = datum;
+            if (datum > max) max = datum;
+          }
+        }
+        const barHeight = Math.max((max - min) * amp, 2);
+        const x = i * barWidth;
+        const y = amp - barHeight / 2;
+        ctx.fillRect(x, y, barWidth - 1, barHeight);
+      }
+      audioCtx.close();
+    } catch (e) {
+      console.error('Failed to draw waveform:', e);
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+      ctx.fillStyle = '#4CAF50';
+      const barWidth = 2;
+      const bars = Math.floor(canvasWidth / barWidth);
+      for (let i = 0; i < bars; i++) {
+        const barHeight = Math.random() * canvasHeight * 0.8 + 2;
+        const x = i * barWidth;
+        const y = (canvasHeight - barHeight) / 2;
+        ctx.fillRect(x, y, barWidth - 1, barHeight);
+      }
+    }
+  };
+
   useEffect(() => {
     if (data.type === ItemType.IMAGE) {
       setImgData(new Array(imgLen).fill(data.url));
     } else if (data.type === ItemType.VIDEO) {
-      // const videoData = new Array(imgLen).fill(data.url);
-      // const videoWidth = Math.floor(100 / videoData.length);
       getImageData();
-      // setImgData(videoData.map((it, i) => getImageFormVideo(
-      //   it,
-      //   500,
-      //   // videoWidth * 10,
-      //   50 * 10,
-      //   i * Math.floor(imgLen / videoData.length),
-      // )));
+    } else if (data.type === ItemType.MUSIC) {
+      drawWaveform();
     }
     return () => {
     };
-  }, [data.url, duration]);
+  }, [data.url, data.type, data.playStart, data.duration]);
+
+  useEffect(() => () => {
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+  }, []);
 
   return (
     <div
@@ -75,16 +149,25 @@ function Fragment({ data, p }: {data: Item, p: DraggableProvided}) {
       >
         <div style={{ width: '100%', position: 'relative' }}>
           {
-            imgData.map((it, i) => (
-              <div
-                key={`${it}${i}`}
-                className="fragment-preview"
-                style={{
-                  backgroundImage: `url(${it})`,
-                  width: `${Math.floor(100 / imgData.length)}%`,
-                }}
+            data.type === ItemType.MUSIC ? (
+              <canvas
+                ref={canvasRef}
+                width={len}
+                height={50}
+                style={{ width: '100%', height: '100%' }}
               />
-            ))
+            ) : (
+              imgData.map((it, i) => (
+                <div
+                  key={`${it}${i}`}
+                  className="fragment-preview"
+                  style={{
+                    backgroundImage: `url(${it})`,
+                    width: `${Math.floor(100 / imgData.length)}%`,
+                  }}
+                />
+              ))
+            )
           }
           {
             data?.keyFrames?.map((it) => (
@@ -99,7 +182,6 @@ function Fragment({ data, p }: {data: Item, p: DraggableProvided}) {
               />
             ))
           }
-          {/* {data.title} */}
         </div>
       </div>
     </div>
