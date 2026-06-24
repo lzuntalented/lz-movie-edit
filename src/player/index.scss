@@ -39,17 +39,19 @@
     top: 0;
     bottom: 0;
     right: 0;
-    // margin: auto;
   }
 }
 .area-move {
-  position: fixed;
+  position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
 
   .ctrl-container {
     margin: 0 0;
     padding: 0 0;
     list-style: none;
-    pointer-events: none;
 
     .line {
       position: absolute;

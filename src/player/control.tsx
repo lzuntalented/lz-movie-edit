@@ -61,34 +61,42 @@ export default function PlayControl(props: PlayerControlProps & {
   if (currentItem.length === 0) return <div />;
   const chidlren = currentItem.map((it) => {
     const Comp = itemRenderMap[it.type];
-    // const { width, height } = curRef.current?.parentNode?.getBoundingClientRect() || {};
     const timespace = store.currentTime - it.start;
+    const isActive = it.id === store.activeItemId;
+    const canControl = isActive && it.type !== ItemType.MUSIC;
 
     const keyframes = it.getKeyFrames();
     if (keyframes && keyframes.length > 1) {
       for (let len = keyframes?.length || 0, i = len - 1; i > 1; i--) {
         const keyframe = keyframes[i];
         if (keyframe.pos > timespace) {
-          // 计算当前帧与上一帧缩放间隔，同时根据时间间隔来计算当前尺寸
-
         }
       }
     }
-    return (
+
+    const itemElement = (
       <div
         className="player-item"
         key={it.id}
         style={{
           left: it.x,
           top: it.y,
-          width: isUndefined(playSize.width) ? 'auto' : it.scale * playSize.width,
-          height: isUndefined(playSize.height) ? 'auto' : it.scale * playSize.height,
+          width: isUndefined(playSize.width) ? 'auto' : it.scale * (playSize.width as number),
+          height: isUndefined(playSize.height) ? 'auto' : it.scale * (playSize.height as number),
         }}
-        // ref={curRef}
       >
         <Comp {...props} {...it} />
       </div>
     );
+
+    if (canControl) {
+      return (
+        <Move key={`move-${it.id}`} onChange={() => refresh()}>
+          {itemElement}
+        </Move>
+      );
+    }
+    return itemElement;
   });
 
   if (currentItem[0].transition

@@ -132,6 +132,7 @@ export default function Player(props: PlayerProps) {
         style={{
           width: showSize.width,
           height: showSize.height,
+          position: 'relative',
         }}
       >
         {/* <div>{store.currentTime}</div> */}
